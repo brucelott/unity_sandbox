@@ -3,13 +3,12 @@ using System.Collections;
 
 public class CameraController : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
+	public GameObject objectToFollow;
+
+	void FixedUpdate() {
+		Vector3 tempPosition = gameObject.transform.position;
+		tempPosition.x = objectToFollow.transform.position.x;
+		gameObject.transform.position = tempPosition;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
 }
