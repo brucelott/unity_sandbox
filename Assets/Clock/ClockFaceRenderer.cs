@@ -4,7 +4,7 @@ using System.Collections;
 public class ClockFaceRenderer : MonoBehaviour {
 	public GameObject face;
 	public GameObject[] tickMarks;
-	private int numTickMarks = 60;
+	// private int numTickMarks = 60;
 	
 	void Start(){
 		// clock face is off center.
