@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-// use SetActive() to pause the clock
 public class ClockSource : MonoBehaviour {
 
 	public delegate void ClockTick(int tick);
@@ -26,22 +25,19 @@ public class ClockSource : MonoBehaviour {
 		get { return ticksPerBeat; }
 	}
 
-	void Start() {
+	void Awake() {
 		Bpm = 120f;
-		Play();
 	}
 
-	void FixedUpdate() {
+	void Update() {
 		if(isPlaying) {
-			if(Time.fixedTime - lastTickTime >= timeBetweenTicks) {
+			if(Time.time - lastTickTime >= timeBetweenTicks) {
 				Tick();
 			}
 		}
 	}
 
 	void UpdateTimeBetweenTicks() {
-		// 60::second / _bpm => dur secondsPerBeat;
-		// secondsPerBeat / _ticksPerBeat => _tickDur;
 		float secondsPerBeat = 60f / bpm;
 		timeBetweenTicks = secondsPerBeat / ticksPerBeat;
 	}
@@ -49,7 +45,7 @@ public class ClockSource : MonoBehaviour {
 	public void Tick() {
 		currentTick++;
 		Debug.Log("tick: " + currentTick);
-		lastTickTime = Time.fixedTime;
+		lastTickTime = Time.time;
 		if(OnTick != null) {
 			OnTick(currentTick);
 		}
