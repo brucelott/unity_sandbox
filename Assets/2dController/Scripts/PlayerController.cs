@@ -1,58 +1,69 @@
-﻿/* using UnityEngine; */
-/* using System.Collections; */
+﻿using UnityEngine;
+using System.Collections;
 
-/* public class PlayerController : MonoBehaviour { */
-/* 	public float maxSpeed = 10f; */
-/* 	public float jumpForce = 300f; */
-/* 	private float horizontalMove = 0; */
-/* 	bool isFacingRight = true; */
-/* 	bool isGrounded = true; */
-/* 	Animator animator; */
+public class PlayerController : MonoBehaviour {
+	public float maxSpeed = 10f;
+	public float jumpForce = 300f;
+	bool isFacingRight = true;
+	bool isGrounded = true;
+	Animator animator;
 
-/* 	void Start() { */
-/* 		animator = GetComponent<Animator>(); */
-/* 	} */
+	public delegate void Trigger();
+	public static event Trigger OnJump;
+	public static event Trigger OnLanding;
 
-/* 	void Update() { */
-/* 		// Check if character is on the ground. */
-/* 		if(!isGrounded && rigidbody2D.velocity.y == 0) */
-/* 			isGrounded = true; */
+	void Start() {
+		animator = GetComponent<Animator>();
+	}
 
-/* 		/1* Controller Input *1/ */
-/* 		// Jump. */
-/* 		if(Input.GetButtonDown("Jump")) { */
-/* 	  	Jump(); */		
-/* 			animator.SetTrigger("Jump"); */
-/* 		} */
-/* 		// X Axis Joystick Movement. */
-/* 		horizontalMove = Input.GetAxis("Horizontal"); */
-/* 		rigidbody2D.velocity = new Vector2(horizontalMove * maxSpeed, */ 
-/* 																			 rigidbody2D.velocity.y); */
-/* 	} */
+	void Update() {
+		// Check if character landed on the ground.
+		if(!isGrounded && rigidbody2D.velocity.y == 0)
+			Land();
 
-/* 	void FixedUpdate() { */
-/* 		// Play the walk or idle animation. */
-/* 		animator.SetFloat("Speed", Mathf.Abs(horizontalMove)); */
+		/* Controller Input */
+		// Jump.
+		if(Input.GetButtonDown("Jump"))
+			Jump();		
 
-/* 		// Flip character direction if necessary. */
-/* 		if(horizontalMove > 0 && !isFacingRight) */
-/* 			ChangeDirection(); */
-/* 		else if(horizontalMove < 0 && isFacingRight) */
-/* 			ChangeDirection(); */
-/* 	} */
+		// Joystick X Axis.
+		float horizontalMove = Input.GetAxis("Horizontal");
+		rigidbody2D.velocity = new Vector2(horizontalMove * maxSpeed, 
+																			 rigidbody2D.velocity.y);
+	}
 
-/* 	private void ChangeDirection() { */
-/* 		isFacingRight = !isFacingRight; */
-/* 		Vector3 localScale = transform.localScale; */
-/* 		localScale.x *= -1; */
-/* 		transform.localScale = localScale; */
-/* 	} */
+	void FixedUpdate() {
+		float horizontalMove = Input.GetAxis("Horizontal");
+		// Flip character direction if necessary.
+		if(horizontalMove > 0 && !isFacingRight)
+			ChangeDirection();
+		else if(horizontalMove < 0 && isFacingRight)
+			ChangeDirection();
 
-/* 	public void Jump() { */ 
-/* 		if(isGrounded) { */	
-/* 			rigidbody2D.AddForce(transform.up * jumpForce); */ 
-/* 			isGrounded = false; */
-/* 		} */
-/* 	} */
+		// Play the walk or idle animation.
+		animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
+	}
 
-/* } */
+	private void ChangeDirection() {
+		isFacingRight = !isFacingRight;
+		Vector3 localScale = transform.localScale;
+		localScale.x *= -1;
+		transform.localScale = localScale;
+	}
+
+	public void Jump() { 
+		if(isGrounded) {	
+			rigidbody2D.AddForce(transform.up * jumpForce); 
+			isGrounded = false;
+			animator.SetTrigger("Jump");
+			if(OnJump != null)
+				OnJump();
+		}
+	}
+
+	public void Land() {
+		isGrounded = true;
+		if(OnLanding != null)
+			OnLanding();
+	}
+}

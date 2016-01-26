@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ControllerBroadcaster : MonoBehaviour {
+public class ControllerInput : MonoBehaviour {
 
 	public delegate void ButtonDown();
 	public static event ButtonDown OnJump;
@@ -22,6 +22,7 @@ public class ControllerBroadcaster : MonoBehaviour {
 		if(HorizontalJoyAxis != null) {
 			float horizontalMove = Input.GetAxis("Horizontal");
 			HorizontalJoyAxis(horizontalMove);	
+			Debug.Log(horizontalMove);
 		}	
 	}
 
