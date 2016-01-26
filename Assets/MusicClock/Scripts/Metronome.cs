@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(AudioSource))]
 public class Metronome : MonoBehaviour {
 
 	AudioSource audioSource;	
@@ -17,7 +18,7 @@ public class Metronome : MonoBehaviour {
 		ClockSource.OnTick -= Click;
 	}
 
-	void Click(int tickNumber) {
+	public void Click(int tickNumber) {
 		audioSource.Play();
 	}
 

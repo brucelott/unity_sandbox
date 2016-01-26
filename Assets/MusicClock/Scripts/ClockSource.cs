@@ -3,17 +3,10 @@ using System.Collections;
 
 public class ClockSource : MonoBehaviour {
 
-	public delegate void ClockTick(int tick);
-    public static event ClockTick OnTick;
-
-	private int currentTick = -1;
-	private float timeBetweenTicks, lastTickTime;
-	private bool isPlaying = false;
-
 	private float bpm;
 	public float Bpm {
 		set {
-			bpm = Mathf.Clamp(value, 20f, 999f);
+			bpm = Mathf.Max(value, 1);
 			UpdateTimeBetweenTicks();
 		}
 		get { return bpm; }
@@ -25,44 +18,54 @@ public class ClockSource : MonoBehaviour {
 		get { return ticksPerBeat; }
 	}
 
+	public delegate void ClockTick(int tick);
+    public static event ClockTick OnTick;
+
+	private int currentTick = -1;
+	private bool isPlaying = false;
+	private double lastTickTime, timeBetweenTicks;
+
 	void Awake() {
 		Bpm = 120f;
 	}
 
-	void Update() {
+	void FixedUpdate() {
 		if(isPlaying) {
-			if(Time.time - lastTickTime >= timeBetweenTicks) {
+			if(AudioSettings.dspTime - lastTickTime >= timeBetweenTicks) {
 				Tick();
 			}
 		}
 	}
 
-	void UpdateTimeBetweenTicks() {
-		float secondsPerBeat = 60f / bpm;
-		timeBetweenTicks = secondsPerBeat / ticksPerBeat;
-	}
-
-	public void Tick() {
-		currentTick++;
-		Debug.Log("tick: " + currentTick);
-		lastTickTime = Time.time;
-		if(OnTick != null) {
-			OnTick(currentTick);
-		}
-	}
-
 	public void Play() {
 		if(isPlaying) {	
+			Debug.Log("Clock - Restarting");
 			currentTick = -1;
-			Tick();
 		} 
 		else {
+			Debug.Log("Clock - Starting");
 			isPlaying = true;
 		}
+		Tick();
 	}
 
 	public void Stop() {
+		Debug.Log("Clock - Stopping");
 		isPlaying = false;
+	}
+
+	void Tick() {
+		currentTick++;
+		if(OnTick != null) {
+			OnTick(currentTick);
+		}
+		lastTickTime = AudioSettings.dspTime;
+		// Debug.Log("tick: " + currentTick);
+	}
+
+	void UpdateTimeBetweenTicks() {
+		double secondsPerBeat = 60f / bpm;
+		timeBetweenTicks = secondsPerBeat / ticksPerBeat;
 	}
 
 }
